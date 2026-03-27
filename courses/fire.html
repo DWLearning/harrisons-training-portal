@@ -1,0 +1,77 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="../css/style.css">
+<script>
+let s=0
+function show(n){
+let slides=document.querySelectorAll(".slide")
+slides.forEach(x=>x.classList.remove("active"))
+slides[n].classList.add("active")
+s=n
+}
+function next(){show(s+1)}
+function back(){show(s-1)}
+</script>
+</head>
+<body onload="show(0)">
+<div class="container">
+
+<div class="slide">
+<h2>Learning Outcomes</h2>
+<div class="slide-layout">
+<div class="slide-text">Understand how fires start<br>Identify fire hazards<br>Understand UK fire safety law<br>Recognise fire extinguishers<br>Know what to do in an emergency</div>
+<div class="slide-img"><img src="../images/Learning Outcomes.png"></div>
+</div>
+<button onclick="next()">Next</button></div>
+<div class="slide">
+<h2>Fire Triangle</h2>
+<div class="slide-layout">
+<div class="slide-text">Heat<br>Fuel<br>Oxygen<br>Removing any one stops a fire</div>
+<div class="slide-img"><img src="../images/Fire Triangle.png"></div>
+</div>
+<button onclick="back()">Back</button><button onclick="next()">Next</button></div>
+<div class="slide">
+<h2>Common Fire Hazards</h2>
+<div class="slide-layout">
+<div class="slide-text">Overloaded sockets<br>Damaged equipment<br>Flammable liquids<br>Blocked exits<br>Poor housekeeping</div>
+<div class="slide-img"><img src="../images/Common Fire Hazards.png"></div>
+</div>
+<button onclick="back()">Back</button><button onclick="next()">Next</button></div>
+<div class="slide">
+<h2>UK Fire Extinguishers</h2>
+<div class="slide-layout">
+<div class="slide-text">Water – wood paper<br>Foam – liquids<br>CO2 – electrical<br>Powder – multiple fires<br>Wet chemical – cooking oils</div>
+<div class="slide-img"><img src="../images/UK Fire Extinguishers.png"></div>
+</div>
+<button onclick="back()">Back</button><button onclick="next()">Next</button></div>
+<div class="slide">
+<h2>If You Discover a Fire</h2>
+<div class="slide-layout">
+<div class="slide-text">Raise the alarm<br>Alert others<br>Evacuate<br>Use nearest safe exit<br>Go to assembly point</div>
+<div class="slide-img"><img src="../images/If You Discover a Fire.png"></div>
+</div>
+<button onclick="back()">Back</button><button onclick="next()">Next</button></div>
+<div class="slide">
+<h2>UK Fire Safety Law</h2>
+<div class="slide-layout">
+<div class="slide-text">Regulatory Reform Fire Safety Order 2005 requires fire risk assessments and staff training</div>
+<div class="slide-img"><img src="../images/UK Fire Safety Law.png"></div>
+</div>
+<button onclick="back()">Back</button><button onclick="next()">Next</button></div>
+<div class="slide">
+<h2>Staff Responsibilities</h2>
+<div class="slide-layout">
+<div class="slide-text">Report hazards<br>Keep exits clear<br>Follow procedures<br>Assist evacuation if safe</div>
+<div class="slide-img"><img src="../images/Staff Responsibilities.png"></div>
+</div>
+<button onclick="back()">Back</button><button onclick="next()">Next</button></div>
+<div class="slide">
+<h2>Training Complete</h2>
+<div class="slide-layout">
+<div class="slide-text">You are now ready to complete the Fire Safety Quiz</div>
+<div class="slide-img"><img src="../images/Training Complete.png"></div>
+</div>
+<button onclick="back()">Back</button><button onclick="location='../quiz.html'">Start Quiz</button></div></div></body></html>

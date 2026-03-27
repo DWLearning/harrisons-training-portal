@@ -1,0 +1,52 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="css/style.css">
+<script>
+if(!localStorage.getItem("currentUser")){
+window.location="login.html"
+}
+function logout(){
+localStorage.removeItem("currentUser")
+window.location="login.html"
+}
+</script>
+</head>
+<body>
+
+<header class="topbar">
+<div class="logo"><img src="images/Logo.jpeg"></div>
+<div class="title">Harrisons Staff Training Portal</div>
+<button class="logout-btn" onclick="logout()">Sign Out</button>
+</header>
+
+<div class="container">
+<div class="tile-grid">
+
+<div class="tile"><a href="courses/fire.html">Fire Safety Training</a></div>
+
+<div class="tile">
+<a href="https://apps.liverpool.gov.uk/knockback/story.html" target="_blank">
+Responsible Alcohol Service
+</a>
+</div>
+
+<div class="tile">
+<a href="https://allergytraining.food.gov.uk/" target="_blank">
+Food Allergen Awareness
+</a>
+</div>
+
+<div class="tile">Food Safety (Coming Soon)</div>
+<div class="tile">Manual Handling (Coming Soon)</div>
+<div class="tile">Cellar Safety (Coming Soon)</div>
+<div class="tile">COSHH (Coming Soon)</div>
+
+<div class="tile"><a href="admin/dashboard.html">Manager Dashboard</a></div>
+
+</div>
+</div>
+</body>
+</html>

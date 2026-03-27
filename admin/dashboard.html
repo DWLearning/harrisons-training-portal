@@ -1,0 +1,97 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><link rel="stylesheet" href="../css/style.css"></head>
+<body>
+
+<script>
+const currentUser = JSON.parse(localStorage.getItem("currentUser") || "{}");
+if(!currentUser.role || currentUser.role !== "manager"){
+    alert("Access restricted: Manager access only.");
+    window.location = "../index.html";
+}
+</script>
+
+<div class="container">
+
+<h2>Manager Dashboard</h2>
+<button onclick="location='../index.html'">Home</button>
+
+<h3>Create User</h3>
+<input id="u" placeholder="Username">
+<input id="p" placeholder="Password">
+<select id="r">
+<option value="staff">Staff</option>
+<option value="manager">Manager</option>
+</select>
+<button onclick="create()">Add User</button>
+
+<h3>Existing Users</h3>
+<table>
+<tr><th>Username</th><th>Role</th><th>Actions</th></tr>
+<tbody id="list"></tbody>
+</table>
+
+</div>
+
+<script>
+
+function load(){
+let users=JSON.parse(localStorage.getItem("users")||"[]")
+let html=""
+users.forEach((x,i)=>{
+html+=`
+<tr>
+<td>${x.username}</td>
+<td>${x.role}</td>
+<td>
+<button onclick="view(${i})">View Password</button>
+<button onclick="update(${i})">Change Password</button>
+<button onclick="changeRole(${i})">Change Role</button>
+<button onclick="del(${i})">Delete User</button>
+</td>
+</tr>
+`
+})
+list.innerHTML=html
+}
+
+function create(){
+let users=JSON.parse(localStorage.getItem("users")||"[]")
+users.push({username:u.value,password:p.value,role:r.value})
+localStorage.setItem("users",JSON.stringify(users))
+load()
+}
+
+function view(i){
+let users=JSON.parse(localStorage.getItem("users"))
+alert("Password: "+users[i].password)
+}
+
+function update(i){
+let users=JSON.parse(localStorage.getItem("users"))
+let np=prompt("Enter new password")
+users[i].password=np
+localStorage.setItem("users",JSON.stringify(users))
+load()
+}
+
+function changeRole(i){
+let users=JSON.parse(localStorage.getItem("users"))
+users[i].role = users[i].role==="manager" ? "staff" : "manager"
+localStorage.setItem("users",JSON.stringify(users))
+load()
+}
+
+function del(i){
+let users=JSON.parse(localStorage.getItem("users"))
+users.splice(i,1)
+localStorage.setItem("users",JSON.stringify(users))
+load()
+}
+
+load()
+</script>
+</body>
+</html>

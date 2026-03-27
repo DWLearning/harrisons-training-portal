@@ -1,0 +1,37 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><link rel="stylesheet" href="css/style.css"></head>
+<body>
+<div class="container">
+<h2>Staff Login</h2>
+<input id="user" placeholder="Username"><br><br>
+<input id="pass" type="password" placeholder="Password"><br><br>
+<button onclick="login()">Login</button>
+<p id="msg"></p>
+</div>
+
+<script>
+if(!localStorage.getItem("users")){
+localStorage.setItem("users",JSON.stringify([
+{username:"manager",password:"admin123",role:"manager"},
+{username:"Dave Woods",password:"CalFin16!GH",role:"manager"}
+]))
+}
+
+function login(){
+let u=user.value
+let p=pass.value
+let users=JSON.parse(localStorage.getItem("users"))
+let found=users.find(x=>x.username==u && x.password==p)
+if(found){
+localStorage.setItem("currentUser",JSON.stringify(found))
+location="index.html"
+}else{
+msg.innerText="Login failed"
+}
+}
+</script>
+</body>
+</html>
