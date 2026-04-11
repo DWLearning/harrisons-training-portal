@@ -1,0 +1,120 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+<img src="images/Logo.jpeg" class="logo">
+
+<div class="container">
+<h2>Staff Login</h2>
+
+<input id="u" placeholder="Username"><br><br>
+<input id="p" type="password" placeholder="Password"><br><br>
+
+<button onclick="login()">Login</button>
+</div>
+
+<script>
+
+
+let users = JSON.parse(localStorage.getItem("users") || "[]");
+
+function ensureDefaultUsers(){
+
+let adminExists = users.some(u => u[0] === "Admin");
+
+if(!adminExists){
+
+users = [
+["ange.c","Angeriver!","Staff"],
+["ben.l","Benforest£","Staff"],
+["clare.d","Claremeadow$","Staff"],
+["Admin","PMnights£","Manager"],
+["dave.w","Davesystem!","Manager"],
+["eirini.t","Eirinibrook&","Staff"],
+["erin.k","Erinstone*","Staff"],
+["fran.s","Franhollow!","Staff"],
+["gemma.","Gemmacedar£","Staff"],
+["jack.h","Jackridge$","Staff"],
+["jamie.s","Jamielake%","Staff"],
+["joe.m","Joeswamp&","Staff"],
+["lauren.h","Laurenfield*","Staff"],
+["lois.m","Loisjungle!","Staff"],
+["rach.w","Rachvalley£","Staff"],
+["tom.g","Tomharbor$","Staff"]
+];
+
+localStorage.setItem("users", JSON.stringify(users));
+
+}else{
+
+users = JSON.parse(localStorage.getItem("users"));
+
+}
+
+}
+
+ensureDefaultUsers();
+
+function login(){
+
+let u=document.getElementById("u").value;
+let p=document.getElementById("p").value;
+
+users = JSON.parse(localStorage.getItem("users") || "[]");
+
+let found = users.find(x => x[0] === u && x[1] === p);
+
+if(found){
+
+sessionStorage.setItem("user", found[0]);
+sessionStorage.setItem("role", found[2]);
+
+if(found[2] === "Manager"){
+window.location.href="admin/dashboard.html";
+}else{
+window.location.href="index.html";
+}
+
+}else{
+
+alert("Invalid username or password");
+
+}
+
+}
+
+function login(){
+
+let u=document.getElementById("u").value;
+let p=document.getElementById("p").value;
+
+let users = JSON.parse(localStorage.getItem("users") || "[]");
+
+let found = users.find(x => x[0] === u && x[1] === p);
+
+if(found){
+
+sessionStorage.setItem("user", found[0]);
+sessionStorage.setItem("role", found[2]);
+
+if(found[2] === "Manager"){
+window.location.href="admin/dashboard.html";
+}else{
+window.location.href="index.html";
+}
+
+}else{
+alert("Invalid username or password");
+}
+
+}
+
+</script>
+
+</body>
+</html>

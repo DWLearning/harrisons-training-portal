@@ -1,0 +1,224 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="stylesheet" href="../css/style.css">
+<script src="../js/auth.js"></script>
+</head>
+
+<body>
+
+<script>
+if(sessionStorage.getItem("role") !== "Manager"){
+alert("Access denied – Manager access only");
+window.location.href="../index.html";
+}
+</script>
+
+<a href="../index.html"><img src="../images/Logo.jpeg" class="logo"></a>
+
+<div class="container">
+
+<div class="section">
+<h2>User Management</h2>
+
+<table id="userTable">
+<tr>
+<th>Username</th>
+<th>Role</th>
+<th>Actions</th>
+</tr>
+</table>
+
+<button onclick="addUser()">Add User</button>
+</div>
+
+<div class="section">
+<h2>Training Compliance</h2>
+
+<input id="name" placeholder="Full Name">
+<input id="course" placeholder="Course Completed">
+<input id="date" type="date">
+
+<button onclick="addRecord()">Add External Course</button>
+
+<table id="records">
+<tr>
+<th>Full Name</th>
+<th>Course Completed</th>
+<th>Completion Date</th>
+<th>Certificate</th>
+<th>Delete</th>
+</tr>
+</table>
+
+</div>
+
+<button onclick="logout()">Sign Out</button>
+
+</div>
+
+<script>
+
+let users = JSON.parse(localStorage.getItem("users") || "[]");
+
+function ensureDefaultUsers(){
+let adminExists = users.some(u => u[0] === "Admin");
+if(!adminExists){
+users = [
+["ange.c","Angeriver!","Staff"],
+["ben.l","Benforest£","Staff"],
+["clare.d","Claremeadow$","Staff"],
+["Admin","PMnights£","Manager"],
+["dave.w","Davesystem!","Manager"],
+["eirini.t","Eirinibrook&","Staff"],
+["erin.k","Erinstone*","Staff"],
+["fran.s","Franhollow!","Staff"],
+["gemma.","Gemmacedar£","Staff"],
+["jack.h","Jackridge$","Staff"],
+["jamie.s","Jamielake%","Staff"],
+["joe.m","Joeswamp&","Staff"],
+["lauren.h","Laurenfield*","Staff"],
+["lois.m","Loisjungle!","Staff"],
+["rach.w","Rachvalley£","Staff"],
+["tom.g","Tomharbor$","Staff"]
+];
+localStorage.setItem("users", JSON.stringify(users));
+}
+}
+
+ensureDefaultUsers();
+users = JSON.parse(localStorage.getItem("users") || "[]");
+
+function loadUsers(){
+let table=document.getElementById("userTable");
+users.forEach((u,i)=>{
+table.innerHTML += `
+<tr>
+<td>${u[0]}</td>
+<td>${u[2]}</td>
+<td>
+<button onclick="viewPassword(${i})">View Password</button>
+<button onclick="changePassword(${i})">Change Password</button>
+<button onclick="changeUsername(${i})">Change Username</button>
+<button onclick="changeRole(${i})">Change Role</button>
+<button onclick="deleteUser(${i})">Delete</button>
+</td>
+</tr>`;
+});
+}
+
+function addUser(){
+let u=prompt("Enter Username");
+let p=prompt("Enter Password");
+let r=prompt("Enter Role (Staff or Manager)");
+if(!u||!p||!r) return;
+users.push([u,p,r]);
+localStorage.setItem("users", JSON.stringify(users));
+location.reload();
+}
+
+function deleteUser(i){
+users.splice(i,1);
+localStorage.setItem("users", JSON.stringify(users));
+location.reload();
+}
+
+function viewPassword(i){
+alert("Password: "+users[i][1]);
+}
+
+function changePassword(i){
+let newPass=prompt("Enter new password");
+if(!newPass) return;
+users[i][1]=newPass;
+localStorage.setItem("users", JSON.stringify(users));
+location.reload();
+}
+
+function changeUsername(i){
+let newUser=prompt("Enter new username");
+if(!newUser) return;
+users[i][0]=newUser;
+localStorage.setItem("users", JSON.stringify(users));
+location.reload();
+}
+
+function changeRole(i){
+let newRole = users[i][2] === "Staff" ? "Manager" : "Staff";
+users[i][2]=newRole;
+localStorage.setItem("users", JSON.stringify(users));
+location.reload();
+}
+
+function addRecord(){
+let name=document.getElementById("name").value;
+let course=document.getElementById("course").value;
+let date=document.getElementById("date").value;
+
+if(!name||!course||!date){
+alert("Please enter Full Name, Course Completed and Completion Date");
+return;
+}
+
+let records = JSON.parse(localStorage.getItem("records") || "[]");
+records.push({name,course,date});
+localStorage.setItem("records", JSON.stringify(records));
+location.reload();
+}
+
+function loadRecords(){
+let records = JSON.parse(localStorage.getItem("records") || "[]");
+let table=document.getElementById("records");
+
+records.forEach((r,i)=>{
+table.innerHTML += `
+<tr>
+<td>${r.name}</td>
+<td>${r.course}</td>
+<td>${r.date}</td>
+<td><button onclick="printCert('${r.name}','${r.course}','${r.date}')">View / Download</button></td>
+<td><button onclick="deleteRecord(${i})">Delete</button></td>
+</tr>`;
+});
+}
+
+function deleteRecord(i){
+let records = JSON.parse(localStorage.getItem("records") || "[]");
+records.splice(i,1);
+localStorage.setItem("records", JSON.stringify(records));
+location.reload();
+}
+
+function printCert(name,course,date){
+let w=window.open("");
+w.document.write(`
+<html>
+<head>
+<title>Certificate</title>
+<style>
+body{font-family:Arial;text-align:center;padding:40px}
+.logo{width:200px;margin-bottom:20px}
+</style>
+</head>
+<body>
+<img src="../images/Logo.jpeg" class="logo">
+<h1>Certificate of Completion</h1>
+<p>This certifies that</p>
+<h2>${name}</h2>
+<p>has successfully completed</p>
+<h3>${course}</h3>
+<p>Date Completed: ${date}</p>
+<br><br>
+<button onclick="window.print()">Print Certificate</button>
+</body>
+</html>`);
+}
+
+loadUsers();
+loadRecords();
+
+</script>
+
+</body>
+</html>

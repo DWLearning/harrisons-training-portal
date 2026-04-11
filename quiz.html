@@ -1,0 +1,112 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="stylesheet" href="css/style.css">
+<script src="js/auth.js"></script>
+</head>
+<body>
+
+<a href="index.html"><img src="images/Logo.jpeg" class="logo"></a>
+
+<div class="container">
+
+<h2>Fire Safety Quiz</h2>
+
+<label>Full Name</label><br>
+<input id="name"><br><br>
+
+<div id="quiz"></div>
+
+<button onclick="submitQuiz()">Complete Course</button>
+
+<div id="certificate" style="display:none">
+
+<h2>Certificate of Completion</h2>
+
+<img src="images/Logo.jpeg" style="width:200px"><br><br>
+
+<p>This certifies that</p>
+
+<h2 id="certName"></h2>
+
+<p>has successfully completed</p>
+
+<h3>Fire Safety Training</h3>
+
+<p>Date Completed: <span id="certDate"></span></p>
+
+<button onclick="window.print()">View / Print Certificate</button>
+
+</div>
+
+</div>
+
+<script>
+
+const questions = [["Which piece of legislation covers fire safety responsibilities in most UK workplaces?", ["Regulatory Reform (Fire Safety) Order 2005", "Health and Safety at Work Act", "Food Safety Act", "Licensing Act"], 0], ["What are the three elements of the fire triangle?", ["Heat Fuel Oxygen", "Water Fuel Heat", "Air Smoke Heat", "Fuel Smoke Oxygen"], 0], ["What should you do if you discover a fire?", ["Raise the alarm", "Ignore it", "Hide it", "Wait"], 0], ["Where should staff go after evacuation?", ["Assembly point", "Office", "Kitchen", "Car park"], 0], ["Who is responsible for fire safety in the workplace?", ["Everyone", "Manager only", "Owner only", "Fire service"], 0], ["What must always be kept clear?", ["Fire exits", "Bar area", "Office desk", "Kitchen sink"], 0], ["Which extinguisher is used for electrical fires?", ["CO2", "Water", "Foam", "Wet Chemical"], 0], ["What helps prevent fires in the workplace?", ["Good housekeeping", "Ignoring hazards", "Blocking exits", "Overloading sockets"], 0], ["What should you never do during a fire?", ["Put yourself at risk", "Raise the alarm", "Evacuate", "Call emergency services"], 0], ["Which extinguisher is used for cooking oil fires?", ["Wet Chemical", "Water", "CO2", "Foam"], 0], ["What document identifies fire hazards in a workplace?", ["Fire Risk Assessment", "Menu", "Inventory", "Cleaning rota"], 0], ["What should you do with damaged electrical equipment?", ["Report it", "Keep using it", "Ignore it", "Hide it"], 0], ["How often should fire training be refreshed?", ["Regularly", "Never", "Once ever", "Only when asked"], 0], ["After evacuating a building you should:", ["Stay at the assembly point", "Go home", "Return inside", "Ignore instructions"], 0]];
+
+function shuffle(a) {
+return a.sort(() => Math.random() - 0.5);
+}
+
+function loadQuiz(){
+
+let qlist = shuffle([...questions]);
+
+let html = "";
+
+qlist.forEach((q,i)=>{
+
+let answers = shuffle([...q[1]]);
+
+html += `<p><b>${i+1}. ${q[0]}</b></p>`;
+
+answers.forEach(a=>{
+
+html += `<label><input type="radio" name="q${i}" value="${a}"> ${a}</label><br>`;
+
+});
+
+});
+
+document.getElementById("quiz").innerHTML = html;
+
+}
+
+function submitQuiz(){
+
+let name = document.getElementById("name").value;
+
+if(!name){
+
+alert("Enter full name");
+
+return;
+
+}
+
+let date = new Date().toLocaleDateString();
+
+let records = JSON.parse(localStorage.getItem("records") || "[]");
+
+records.push({name:name,course:"Fire Safety",date:date});
+
+localStorage.setItem("records",JSON.stringify(records));
+
+document.getElementById("quiz").style.display="none";
+
+document.getElementById("certificate").style.display="block";
+
+document.getElementById("certName").innerText=name;
+
+document.getElementById("certDate").innerText=date;
+
+}
+
+loadQuiz();
+
+</script>
+
+</body>
+</html>
