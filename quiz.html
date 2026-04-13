@@ -96,13 +96,7 @@ localStorage.setItem("records",JSON.stringify(records));
 
 document.getElementById("quiz").style.display="none";
 
-
-let records = JSON.parse(localStorage.getItem("records") || "[]");
-records.push({name:name,course:"Fire Safety",date:date});
-localStorage.setItem("records", JSON.stringify(records));
-
 document.getElementById("certificate").style.display="block";
-
 
 document.getElementById("certName").innerText=name;
 
