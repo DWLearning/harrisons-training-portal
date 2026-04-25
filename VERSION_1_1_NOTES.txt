@@ -1,0 +1,7 @@
+Version 1.1 Updates:
+- Fixed payslip logo visibility
+- Added House Name/Number
+- Added Address Line 2
+- Added City
+- Added Postcode
+- Added Date of Birth

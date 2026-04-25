@@ -1,224 +1,51 @@
-
-<!DOCTYPE html>
-<html>
-<head>
-<link rel="stylesheet" href="../css/style.css">
-<script src="../js/auth.js"></script>
-</head>
-
-<body>
-
+<!DOCTYPE html><html><head><link rel='stylesheet' href='../css/style.css'><script src='../js/auth.js'></script>
+<style>.tabs button{margin:4px}.tab{display:none}.tab.active{display:block}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px}.small{font-size:12px;color:#666}.grid label{display:flex;flex-direction:column;font-size:12px;color:#444;gap:4px}.grid label input{font-size:14px}</style></head><body>
+<script>if(sessionStorage.getItem('role')!=='Manager'){alert('Access denied – Manager access only');location.href='../index.html';}</script>
+<a href='../index.html'><img src='../images/Logo.jpeg' class='logo'></a><div class='container'>
+<div class='section tabs'>
+<button onclick="showTab('users')">User Management</button>
+<button onclick="showTab('training')">Training Compliance</button>
+<button onclick="showTab('payroll')">Payroll</button>
+</div>
+<div id='users' class='section tab active'><h2>User Management</h2><button onclick='addUser()'>Add User</button><input id='userSearch' placeholder='Search staff' oninput='loadUsers()'><table id='userTable'><tr><th>Username</th><th>Role</th><th>Actions</th></tr></table></div>
+<div id='training' class='section tab'><h2>Training Compliance</h2><input id='trainSearch' placeholder='Search staff' oninput='loadRecords()'><button onclick='exportTrainingExcel()'>Export Excel</button><input id='name' placeholder='Full Name'><input id='course' placeholder='Course Completed'><input id='date' type='date'><button onclick='addRecord()'>Add External Course</button><table id='records'><tr><th>Full Name</th><th>Course Completed</th><th>Completion Date</th><th>Certificate</th><th>Delete</th></tr></table></div>
+<div id='payroll' class='section tab'><h2>Payroll</h2><input id='empSearch' placeholder='Search staff' oninput='loadEmployees()'>
+<div class='grid'>
+<input id='empName' placeholder='Full Name'><input id='empHouse' placeholder='House Name / Number'><input id='empAddr' placeholder='Address Line 1'><input id='empAddr2' placeholder='Address Line 2'><input id='empCity' placeholder='City'><input id='empPost' placeholder='Postcode'><label>Date of Birth<input id='empDob' type='date'></label><input id='empNo' placeholder='Employee Number'><input id='empTitle' placeholder='Job Title'><label>Company Start Date<input id='empStart' type='date'></label><input id='empRate' placeholder='Hourly Rate'><input id='empNi' placeholder='NI Number'><input id='empTax' placeholder='Tax Code'><input id='empRef' placeholder='Payroll Ref'><input id='empEmail' placeholder='Email'>
+</div><button onclick='saveEmployee()'>Save Employee</button>
+<table id='empTable'><tr><th>Name</th><th>No</th><th>Rate</th><th>Actions</th></tr></table>
+<hr><h3>Generate Payslip</h3><select id='payEmp'></select><div class='grid'><input id='hours' placeholder='Hours Worked'><input id='ot' placeholder='Overtime Hours'><input id='hol' placeholder='Holiday Hours'><input id='bonus' placeholder='Bonus'><input id='ded' placeholder='Deductions'></div><button onclick='generatePayslip()'>Generate Payslip</button><div id='slipHistory'></div><div class='small'>Select saved employee then enter only pay-period hours/details.</div></div>
+<button onclick='logout()'>Sign Out</button></div>
 <script>
-if(sessionStorage.getItem("role") !== "Manager"){
-alert("Access denied – Manager access only");
-window.location.href="../index.html";
-}
-</script>
+function showTab(id){document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));document.getElementById(id).classList.add('active');}
+let users=JSON.parse(localStorage.getItem('users')||'[]');function ensureDefaultUsers(){if(!users.some(u=>u[0]==='Admin')){users=[["Admin","PMnights£","Manager"],["dave.w","Davesystem!","Manager"]];localStorage.setItem('users',JSON.stringify(users));}}ensureDefaultUsers();users=JSON.parse(localStorage.getItem('users')||'[]');
+function loadUsers(){let t=userTable;let q=(userSearch&&userSearch.value||'').toLowerCase();t.innerHTML='<tr><th>Username</th><th>Role</th><th>Actions</th></tr>';users.filter(u=>u[0].toLowerCase().includes(q)).forEach((u,i)=>t.innerHTML+=`<tr><td>${u[0]}</td><td>${u[2]}</td><td><button onclick='viewPassword(${i})'>View Password</button><button onclick='changePassword(${i})'>Change Password</button><button onclick='changeUsername(${i})'>Change Username</button><button onclick='changeRole(${i})'>Change Role</button><button onclick='deleteUser(${i})'>Delete</button></td></tr>`)}
+function addUser(){let u=prompt('Enter Username'),p=prompt('Enter Password'),r=prompt('Enter Role (Staff or Manager)');if(!u||!p||!r)return;users.push([u,p,r]);localStorage.setItem('users',JSON.stringify(users));loadUsers();}
+function deleteUser(i){users.splice(i,1);localStorage.setItem('users',JSON.stringify(users));loadUsers();}
+function viewPassword(i){alert('Password: '+users[i][1]);}function changePassword(i){let v=prompt('Enter new password');if(v){users[i][1]=v;localStorage.setItem('users',JSON.stringify(users));loadUsers();}}function changeUsername(i){let v=prompt('Enter new username');if(v){users[i][0]=v;localStorage.setItem('users',JSON.stringify(users));loadUsers();}}function changeRole(i){users[i][2]=users[i][2]==='Staff'?'Manager':'Staff';localStorage.setItem('users',JSON.stringify(users));loadUsers();}
+function addRecord(){let namev=name.value,coursev=course.value,datev=date.value;if(!namev||!coursev||!datev)return alert('Complete all fields');let r=JSON.parse(localStorage.getItem('records')||'[]');r.push({name:namev,course:coursev,date:datev});localStorage.setItem('records',JSON.stringify(r));loadRecords();}
+function loadRecords(){let arr=JSON.parse(localStorage.getItem('records')||'[]');records.innerHTML='<tr><th>Full Name</th><th>Course Completed</th><th>Completion Date</th><th>Certificate</th><th>Delete</th></tr>';arr.forEach((r,i)=>records.innerHTML+=`<tr><td>${r.name}</td><td>${r.course}</td><td>${r.date}</td><td><button onclick="printCert('${r.name}','${r.course}','${r.date}')">View / Download</button></td><td><button onclick='deleteRecord(${i})'>Delete</button></td></tr>`)}
+function deleteRecord(i){let r=JSON.parse(localStorage.getItem('records')||'[]');r.splice(i,1);localStorage.setItem('records',JSON.stringify(r));loadRecords();}
+function printCert(n,c,d){let w=open('');w.document.write(`<h1>Certificate</h1><h2>${n}</h2><p>${c}</p><p>${d}</p><button onclick='print()'>Print</button>`)}
+function getEmps(){return JSON.parse(localStorage.getItem('employees')||'[]')}
+function setEmps(v){localStorage.setItem('employees',JSON.stringify(v))}
+function saveEmployee(){let e={name:empName.value,house:empHouse.value,address:empAddr.value,address2:empAddr2.value,city:empCity.value,post:empPost.value,dob:empDob.value,no:empNo.value,title:empTitle.value,start:empStart.value,rate:parseFloat(empRate.value||0),ni:empNi.value,tax:empTax.value,ref:empRef.value,email:empEmail.value};if(!e.name)return alert('Enter employee name');let arr=getEmps();let idx=arr.findIndex(x=>x.no===e.no&&e.no);if(idx>-1)arr[idx]=e;else arr.push(e);setEmps(arr);loadEmployees();}
+function editEmp(i){let e=getEmps()[i];empName.value=e.name;empHouse.value=e.house||'';empAddr.value=e.address||'';empAddr2.value=e.address2||'';empCity.value=e.city||'';empPost.value=e.post||'';empDob.value=e.dob||'';empNo.value=e.no;empTitle.value=e.title;empStart.value=e.start;empRate.value=e.rate;empNi.value=e.ni;empTax.value=e.tax;empRef.value=e.ref;empEmail.value=e.email;}
+function delEmp(i){let a=getEmps();a.splice(i,1);setEmps(a);loadEmployees();}
+function loadEmployees(){let a=getEmps();let q=(empSearch&&empSearch.value||'').toLowerCase();empTable.innerHTML='<tr><th>Name</th><th>No</th><th>Rate</th><th>Actions</th></tr>';payEmp.innerHTML='';a.filter(e=>(e.name||'').toLowerCase().includes(q)||(e.no||'').toLowerCase().includes(q)).forEach((e,i)=>{empTable.innerHTML+=`<tr><td>${e.name}</td><td>${e.no}</td><td>£${e.rate.toFixed(2)}</td><td><button onclick='editEmp(${i})'>Edit</button><button onclick='delEmp(${i})'>Delete</button></td></tr>`;payEmp.innerHTML+=`<option value='${i}'>${e.name}</option>`})}
+function generatePayslip(){let e=getEmps()[payEmp.value];if(!e)return;let h=+hours.value||0,o=+ot.value||0,ho=+hol.value||0,b=+bonus.value||0,d=+ded.value||0;let gross=((h+ho)*e.rate)+(o*e.rate*1.5)+b-d;let w=open('');w.document.write(`<html><body style='font-family:Arial;padding:20px'><img src='../images/Logo.jpeg' style='height:90px'><h1>Payslip</h1><h2>Harrisons</h2><p>${e.name}<br>${e.house||''} ${e.address||''}<br>${e.address2||''}<br>${e.city||''} ${e.post||''}<br>${e.email}</p><p>DOB: ${e.dob||''}<br>Employee No: ${e.no} | ${e.title}<br>Start: ${e.start}<br>NI: ${e.ni} Tax: ${e.tax} Ref: ${e.ref}</p><hr><p>Rate £${e.rate.toFixed(2)}<br>Hours ${h}<br>Overtime ${o}<br>Holiday ${ho}<br>Bonus £${b}<br>Deductions £${d}</p><h2>Gross Pay £${gross.toFixed(2)}</h2><button onclick='print()'>Print / Save PDF</button></body></html>`)}
 
-<a href="../index.html"><img src="../images/Logo.jpeg" class="logo"></a>
-
-<div class="container">
-
-<div class="section">
-<h2>User Management</h2>
-
-<table id="userTable">
-<tr>
-<th>Username</th>
-<th>Role</th>
-<th>Actions</th>
-</tr>
-</table>
-
-<button onclick="addUser()">Add User</button>
-</div>
-
-<div class="section">
-<h2>Training Compliance</h2>
-
-<input id="name" placeholder="Full Name">
-<input id="course" placeholder="Course Completed">
-<input id="date" type="date">
-
-<button onclick="addRecord()">Add External Course</button>
-
-<table id="records">
-<tr>
-<th>Full Name</th>
-<th>Course Completed</th>
-<th>Completion Date</th>
-<th>Certificate</th>
-<th>Delete</th>
-</tr>
-</table>
-
-</div>
-
-<button onclick="logout()">Sign Out</button>
-
-</div>
-
-<script>
-
-let users = JSON.parse(localStorage.getItem("users") || "[]");
-
-function ensureDefaultUsers(){
-let adminExists = users.some(u => u[0] === "Admin");
-if(!adminExists){
-users = [
-["ange.c","Angeriver!","Staff"],
-["ben.l","Benforest£","Staff"],
-["clare.d","Claremeadow$","Staff"],
-["Admin","PMnights£","Manager"],
-["dave.w","Davesystem!","Manager"],
-["eirini.t","Eirinibrook&","Staff"],
-["erin.k","Erinstone*","Staff"],
-["fran.s","Franhollow!","Staff"],
-["gemma.","Gemmacedar£","Staff"],
-["jack.h","Jackridge$","Staff"],
-["jamie.s","Jamielake%","Staff"],
-["joe.m","Joeswamp&","Staff"],
-["lauren.h","Laurenfield*","Staff"],
-["lois.m","Loisjungle!","Staff"],
-["rach.w","Rachvalley£","Staff"],
-["tom.g","Tomharbor$","Staff"]
-];
-localStorage.setItem("users", JSON.stringify(users));
-}
+function exportTrainingExcel(){
+let arr=JSON.parse(localStorage.getItem('records')||'[]');
+let q=(trainSearch&&trainSearch.value||'').toLowerCase();
+arr=arr.filter(r=>(r.name||'').toLowerCase().includes(q));
+arr.sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+let x='\uFEFF<table border="1"><tr><th>Full Name</th><th>Course Completed</th><th>Completion Date</th></tr>';
+arr.forEach(r=>{x+=`<tr><td>${r.name}</td><td>${r.course}</td><td>${r.date}</td></tr>`});
+x+='</table>';
+let blob=new Blob([x],{type:'application/vnd.ms-excel'});
+let a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='Training_Compliance_Export.xls';a.click();
 }
 
-ensureDefaultUsers();
-users = JSON.parse(localStorage.getItem("users") || "[]");
-
-function loadUsers(){
-let table=document.getElementById("userTable");
-users.forEach((u,i)=>{
-table.innerHTML += `
-<tr>
-<td>${u[0]}</td>
-<td>${u[2]}</td>
-<td>
-<button onclick="viewPassword(${i})">View Password</button>
-<button onclick="changePassword(${i})">Change Password</button>
-<button onclick="changeUsername(${i})">Change Username</button>
-<button onclick="changeRole(${i})">Change Role</button>
-<button onclick="deleteUser(${i})">Delete</button>
-</td>
-</tr>`;
-});
-}
-
-function addUser(){
-let u=prompt("Enter Username");
-let p=prompt("Enter Password");
-let r=prompt("Enter Role (Staff or Manager)");
-if(!u||!p||!r) return;
-users.push([u,p,r]);
-localStorage.setItem("users", JSON.stringify(users));
-location.reload();
-}
-
-function deleteUser(i){
-users.splice(i,1);
-localStorage.setItem("users", JSON.stringify(users));
-location.reload();
-}
-
-function viewPassword(i){
-alert("Password: "+users[i][1]);
-}
-
-function changePassword(i){
-let newPass=prompt("Enter new password");
-if(!newPass) return;
-users[i][1]=newPass;
-localStorage.setItem("users", JSON.stringify(users));
-location.reload();
-}
-
-function changeUsername(i){
-let newUser=prompt("Enter new username");
-if(!newUser) return;
-users[i][0]=newUser;
-localStorage.setItem("users", JSON.stringify(users));
-location.reload();
-}
-
-function changeRole(i){
-let newRole = users[i][2] === "Staff" ? "Manager" : "Staff";
-users[i][2]=newRole;
-localStorage.setItem("users", JSON.stringify(users));
-location.reload();
-}
-
-function addRecord(){
-let name=document.getElementById("name").value;
-let course=document.getElementById("course").value;
-let date=document.getElementById("date").value;
-
-if(!name||!course||!date){
-alert("Please enter Full Name, Course Completed and Completion Date");
-return;
-}
-
-let records = JSON.parse(localStorage.getItem("records") || "[]");
-records.push({name,course,date});
-localStorage.setItem("records", JSON.stringify(records));
-location.reload();
-}
-
-function loadRecords(){
-let records = JSON.parse(localStorage.getItem("records") || "[]");
-let table=document.getElementById("records");
-
-records.forEach((r,i)=>{
-table.innerHTML += `
-<tr>
-<td>${r.name}</td>
-<td>${r.course}</td>
-<td>${r.date}</td>
-<td><button onclick="printCert('${r.name}','${r.course}','${r.date}')">View / Download</button></td>
-<td><button onclick="deleteRecord(${i})">Delete</button></td>
-</tr>`;
-});
-}
-
-function deleteRecord(i){
-let records = JSON.parse(localStorage.getItem("records") || "[]");
-records.splice(i,1);
-localStorage.setItem("records", JSON.stringify(records));
-location.reload();
-}
-
-function printCert(name,course,date){
-let w=window.open("");
-w.document.write(`
-<html>
-<head>
-<title>Certificate</title>
-<style>
-body{font-family:Arial;text-align:center;padding:40px}
-.logo{width:200px;margin-bottom:20px}
-</style>
-</head>
-<body>
-<img src="../images/Logo.jpeg" class="logo">
-<h1>Certificate of Completion</h1>
-<p>This certifies that</p>
-<h2>${name}</h2>
-<p>has successfully completed</p>
-<h3>${course}</h3>
-<p>Date Completed: ${date}</p>
-<br><br>
-<button onclick="window.print()">Print Certificate</button>
-</body>
-</html>`);
-}
-
-loadUsers();
-loadRecords();
-
-</script>
-
-</body>
-</html>
+loadUsers();loadRecords();loadEmployees();renderSlips();
+</script></body></html>
